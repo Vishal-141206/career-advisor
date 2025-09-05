@@ -226,7 +226,7 @@ else:
                 radialaxis=dict(visible=True, range=[0, max(scores)+1])
             ),
             showlegend=False,
-            title="📊 Your Interest Profile (Interactive)"
+            title="📊 Your Interest Profile"
         )
 
         st.plotly_chart(fig, use_container_width=True)
