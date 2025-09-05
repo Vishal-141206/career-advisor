@@ -167,7 +167,7 @@ else:
         )
         st.info("✨ \"The best way to predict the future is to create it.\" — Abraham Lincoln")
         st.divider()
-        if st.button("🚀 Start Quiz", type="primary", use_container_width=True):
+        if st.button("🚀 Start Quiz", use_container_width=True):
             st.session_state.quiz_started = True
             st.rerun()
 
@@ -301,3 +301,4 @@ else:
         if st.button("🔄 Take Quiz Again", use_container_width=True):
             restart_quiz()
             st.rerun()
+
