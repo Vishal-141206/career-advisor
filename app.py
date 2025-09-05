@@ -77,9 +77,15 @@ def restart_quiz():
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CSS for fade-in cards ---
+# --- CSS for Blue & White Theme ---
 fade_css = """
 <style>
+/* Background for the entire app */
+body {
+    background-color: #e6f0ff;
+}
+
+/* Fade-in cards */
 @keyframes fadeIn {
     from {opacity: 0;}
     to {opacity: 1;}
@@ -88,18 +94,37 @@ fade_css = """
     animation: fadeIn 0.8s ease-in-out;
     border-radius: 20px;
     padding: 25px;
-    background: linear-gradient(135deg, #d0f0fd, #a0d8ef);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    background: linear-gradient(135deg, #ffffff, #cce0ff);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
 .fade-card h3 {
-    color: #1f77b4;
+    color: #003366;
     margin-bottom: 10px;
 }
 .fade-card p {
-    color: #0b3d91;
+    color: #004080;
     font-size: 16px;
     font-weight: 600;
+}
+
+/* Streamlit buttons */
+.stButton>button {
+    background-color: #004080;
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 8px 24px;
+    border: none;
+}
+.stButton>button:hover {
+    background-color: #0059b3;
+    color: white;
+}
+
+/* Progress bar color */
+div[data-testid="stProgressBar"]>div>div>div>div {
+    background-color: #004080 !important;
 }
 </style>
 """
@@ -168,7 +193,7 @@ else:
         }
         st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
 
-        # Degree and career options with icons
+        # Degree and career options
         degree_map = {
             "Science": [("B.Tech in CS", "💻"), ("B.Sc Physics", "⚛️"), ("MBBS", "🩺"), ("BCA", "🖥")],
             "Commerce": [("B.Com Hons", "📚"), ("CA", "🧾"), ("BBA Finance", "💹"), ("BA Economics", "💵")],
@@ -194,7 +219,7 @@ else:
 
         st.divider()
 
-        # --- Interactive Radar Chart using Plotly ---
+        # Radar Chart
         dimension_scores = {}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] = dimension_scores.get(dim, 0) + st.session_state.answers[i]
@@ -216,7 +241,7 @@ else:
                     name='Interest Score',
                     hoverinfo='text',
                     hovertext=hover_text,
-                    line=dict(color='#1f77b4', width=3)
+                    line=dict(color='#004080', width=3)
                 )
             ]
         )
@@ -226,9 +251,12 @@ else:
                 radialaxis=dict(visible=True, range=[0, max(scores)+1])
             ),
             showlegend=False,
-             title=dict(
-        text="📊 Your Interest Profile ",
-        font=dict(size=24))
+            title=dict(
+                text="📊 Your Interest Profile ",
+                font=dict(size=24, color="#004080")
+            ),
+            paper_bgcolor='#e6f0ff',
+            plot_bgcolor='#e6f0ff'
         )
 
         st.plotly_chart(fig, use_container_width=True)
