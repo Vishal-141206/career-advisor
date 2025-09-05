@@ -87,6 +87,44 @@ body, .stApp {
     color: #003366;
 }
 
+/* Buttons */
+.stButton>button {
+    background-color: #0066cc !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 24px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.stButton>button:hover,
+.stButton>button:focus,
+.stButton>button:active {
+    background-color: #0052a3 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,80,180,0.2);
+}
+
+/* Special primary button */
+.stButton.primary>button {
+    background-color: #ff6600 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 12px 26px;
+    border: none;
+}
+
+.stButton.primary>button:hover {
+    background-color: #e65c00 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(230,92,0,0.3);
+}
+
+/* Rest of your CSS (same as before)... */
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 .fade-card {
     animation: fadeIn 0.8s ease-in-out;
@@ -97,39 +135,8 @@ body, .stApp {
     margin-bottom: 20px;
     border: 1px solid #cce0ff;
 }
-
-.fade-card h3 { 
-    color: #003366 !important;
-    margin-bottom: 15px;
-}
-
-.fade-card p { 
-    color: #00509e !important; 
-    font-weight: 600;
-    margin-bottom: 0;
-    font-size: 0.95rem;
-}
-
-.stButton>button {
-    background-color: #0066cc;
-    color: white !important;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 10px 24px;
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.stButton>button:hover {
-    background-color: #0052a3;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,80,180,0.2);
-}
-
-div[data-testid="stProgressBar"]>div>div>div>div {
-    background-color: #0066cc !important;
-}
+.fade-card h3 { color: #003366 !important; margin-bottom: 15px; }
+.fade-card p { color: #00509e !important; font-weight: 600; margin-bottom: 0; font-size: 0.95rem; }
 
 /* Alerts */
 .stAlert > div {
@@ -141,18 +148,11 @@ div[data-testid="stProgressBar"]>div>div>div>div {
 }
 
 /* Headers */
-h1, h2, h3 {
-    color: #003366 !important;
-}
+h1, h2, h3 { color: #003366 !important; }
 
 /* Radio buttons */
-div[role="radiogroup"] label {
-    color: #003366 !important;
-}
-
-div[role="radiogroup"] label:hover {
-    color: #0066cc !important;
-}
+div[role="radiogroup"] label { color: #003366 !important; }
+div[role="radiogroup"] label:hover { color: #0066cc !important; }
 
 /* Expander styling */
 .streamlit-expanderHeader {
@@ -164,7 +164,6 @@ div[role="radiogroup"] label:hover {
     margin-bottom: 5px;
     border: 1px solid #cce0ff;
 }
-
 .streamlit-expanderContent {
     background-color: #f7fbff;
     border-radius: 0 0 8px 8px;
@@ -174,34 +173,18 @@ div[role="radiogroup"] label:hover {
 }
 
 /* Progress bar container */
-div[data-testid="stProgressBar"] {
-    margin-bottom: 25px;
-}
+div[data-testid="stProgressBar"] { margin-bottom: 25px; }
+div[data-testid="stProgressBar"]>div>div>div>div { background-color: #0066cc !important; }
 
-/* Success message */
-.stSuccess {
-    background-color: #e6f7ff !important;
-    color: #003366 !important;
-    border-left: 6px solid #0066cc !important;
-}
-
-/* Info message */
-.stInfo {
-    background-color: #e6f2ff !important;
-    color: #003366 !important;
-    border-left: 6px solid #0066cc !important;
-}
+/* Success & Info */
+.stSuccess { background-color: #e6f7ff !important; color: #003366 !important; border-left: 6px solid #0066cc !important; }
+.stInfo { background-color: #e6f2ff !important; color: #003366 !important; border-left: 6px solid #0066cc !important; }
 
 /* Markdown text */
-div[data-testid="stMarkdownContainer"] p {
-    color: #003366 !important;
-}
+div[data-testid="stMarkdownContainer"] p { color: #003366 !important; }
 
 /* Divider */
-hr {
-    border-top: 2px solid #cce0ff !important;
-    margin: 30px 0 !important;
-}
+hr { border-top: 2px solid #cce0ff !important; margin: 30px 0 !important; }
 
 /* Motivational section */
 .motivation-card {
@@ -211,28 +194,11 @@ hr {
     margin: 15px 0;
     border-left: 5px solid #0066cc;
 }
-
-.quote-text {
-    font-style: italic;
-    color: #004080;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-}
-
-.quote-author {
-    font-weight: 600;
-    color: #0066cc;
-    text-align: right;
-}
+.quote-text { font-style: italic; color: #004080; font-size: 1.1rem; margin-bottom: 10px; }
+.quote-author { font-weight: 600; color: #0066cc; text-align: right; }
 
 /* Feature cards */
-.feature-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin: 20px 0;
-}
-
+.feature-grid { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }
 .feature-card {
     flex: 1 1 calc(33.333% - 15px);
     min-width: 200px;
@@ -243,17 +209,8 @@ hr {
     text-align: center;
     border: 1px solid #cce0ff;
 }
-
-.feature-icon {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-.feature-title {
-    font-weight: 600;
-    color: #0066cc;
-    margin-bottom: 8px;
-}
+.feature-icon { font-size: 2rem; margin-bottom: 10px; }
+.feature-title { font-weight: 600; color: #0066cc; margin-bottom: 8px; }
 </style>
 """
 
@@ -303,11 +260,10 @@ else:
         # How It Works
         with st.expander("ℹ️ How It Works"):
             st.markdown("""
-            1. **Answer 12 simple questions** about your preferences and interests
-            2. **Our AI analyzes** your responses using the Holland Code model
-            3. **Get personalized recommendations** for educational streams and careers
+            1. **Answer 12 simple questions** about your preferences and interests  
+            2. **Our AI analyzes** your responses using the Holland Code model  
+            3. **Get personalized recommendations** for educational streams and careers  
             4. **Explore your interest profile** with our interactive radar chart
-            
             """)
         
         # Additional Motivation
