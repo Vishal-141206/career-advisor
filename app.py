@@ -157,34 +157,44 @@ else:
         prediction_text = label_encoder.inverse_transform(prediction_encoded)[0]
 
         st.balloons()
-        st.success(f"🎯 Recommended Stream: **{prediction_text}**")
+        st.success(f"🎯 Congratulations! Your recommended stream is: **{prediction_text}**")
 
+        # Motivational message
+        stream_messages = {
+            "Science": "🔬 Explore, experiment, and innovate! Your curiosity will lead you far.",
+            "Commerce": "💰 Numbers and strategy are your allies. Time to build your empire!",
+            "Arts": "🎨 Creativity and expression are your strengths. Share your vision with the world!",
+            "Vocational": "🛠 Hands-on skills open doors. Master your craft and shine!"
+        }
+        st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
+
+        # Degree and career options with icons
         degree_map = {
-            "Science": ["B.Tech in CS", "B.Sc Physics", "MBBS", "BCA"],
-            "Commerce": ["B.Com Hons", "CA", "BBA Finance", "BA Economics"],
-            "Arts": ["BA Psychology", "BFA", "BA Journalism", "BA English Lit"],
-            "Vocational": ["Diploma Web Designing", "ITI Electrical", "B.Voc Hospitality", "Skill Plumbing"]
+            "Science": [("B.Tech in CS", "💻"), ("B.Sc Physics", "⚛️"), ("MBBS", "🩺"), ("BCA", "🖥")],
+            "Commerce": [("B.Com Hons", "📚"), ("CA", "🧾"), ("BBA Finance", "💹"), ("BA Economics", "💵")],
+            "Arts": [("BA Psychology", "🧠"), ("BFA", "🎨"), ("BA Journalism", "📰"), ("BA English Lit", "📖")],
+            "Vocational": [("Diploma Web Designing", "💻"), ("ITI Electrical", "⚡"), ("B.Voc Hospitality", "🏨"), ("Skill Plumbing", "🔧")]
         }
         career_map = {
-            "Science": ["Software Engineer", "Research Scientist", "Doctor", "Data Scientist"],
-            "Commerce": ["Accountant", "Investment Banker", "Entrepreneur", "Financial Analyst"],
-            "Arts": ["Psychologist", "Graphic Designer", "Journalist", "Content Writer"],
-            "Vocational": ["Full-Stack Dev", "Electrician", "Hotel Manager", "Mechanic"]
+            "Science": [("Software Engineer", "💻"), ("Research Scientist", "🔬"), ("Doctor", "🩺"), ("Data Scientist", "📊")],
+            "Commerce": [("Accountant", "📒"), ("Investment Banker", "💰"), ("Entrepreneur", "🚀"), ("Financial Analyst", "📈")],
+            "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨"), ("Journalist", "📰"), ("Content Writer", "✍️")],
+            "Vocational": [("Full-Stack Dev", "💻"), ("Electrician", "⚡"), ("Hotel Manager", "🏨"), ("Mechanic", "🔧")]
         }
 
-        col1, col2 = st.columns(2, gap="large")
-        with col1:
-            st.subheader("🎓 Degree Options")
-            for d in degree_map.get(prediction_text, ["N/A"]):
-                st.markdown(f"✔️ {d}")
-        with col2:
-            st.subheader("💼 Career Paths")
-            for c in career_map.get(prediction_text, ["N/A"]):
-                st.markdown(f"✔️ {c}")
+        st.subheader("🎓 Degree Options")
+        for d, icon in degree_map.get(prediction_text, [("N/A","❓")]):
+            with st.expander(f"{icon} {d}"):
+                st.write(f"Learn more about **{d}**. This program aligns with your interests in {prediction_text}.")
+
+        st.subheader("💼 Career Paths")
+        for c, icon in career_map.get(prediction_text, [("N/A","❓")]):
+            with st.expander(f"{icon} {c}"):
+                st.write(f"Explore the path of a **{c}**. This career fits well with your strengths in {prediction_text}.")
 
         st.divider()
 
-        # --- Radar Chart without Icons ---
+        # --- Radar Chart ---
         dimension_scores = {}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] = dimension_scores.get(dim, 0) + st.session_state.answers[i]
@@ -196,22 +206,16 @@ else:
         angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False).tolist()
         angles += angles[:1]
 
-        # Colors for edges
         colors = ['#FF6F61','#6B5B95','#88B04B','#F7CAC9','#92A8D1','#955251'][:len(labels)]
 
         fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
-
-        # Draw polygon
         ax.plot(angles, scores, 'o-', linewidth=2, color='#1f77b4')
         ax.fill(angles, scores, color="#1f77b4", alpha=0.25)
 
-        # Optional: draw edges in different colors
         for i in range(len(labels)):
             ax.plot([angles[i], angles[i+1]], [scores[i], scores[i+1]], color=colors[i], linewidth=2)
 
-        # Set labels (no icons)
         ax.set_thetagrids(np.degrees(angles[:-1]), labels, fontsize=12)
-
         ax.set_ylim(0, max(scores)+1)
         ax.set_title("Your Interest Profile", fontsize=16, pad=20)
         ax.grid(True)
