@@ -226,7 +226,9 @@ else:
                 radialaxis=dict(visible=True, range=[0, max(scores)+1])
             ),
             showlegend=False,
-            title="📊 Your Interest Profile"
+             title=dict(
+        text="📊 Your Interest Profile ",
+        font=dict(size=24))
         )
 
         st.plotly_chart(fig, use_container_width=True)
