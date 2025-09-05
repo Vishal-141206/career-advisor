@@ -308,15 +308,13 @@ else:
             3. **Get personalized recommendations** for educational streams and careers
             4. **Explore your interest profile** with our interactive radar chart
             
-            The assessment is based on John Holland's theory that people and work environments can be classified into six different groups:
-            Realistic, Investigative, Artistic, Social, Enterprising, and Conventional.
             """)
         
         # Additional Motivation
         st.markdown("""
         <div class="motivation-card">
-            <div class="quote-text">"Choose a job you love, and you will never have to work a day in your life."</div>
-            <div class="quote-author">— Confucius</div>
+            <div class="quote-text">"Success is not final, failure is not fatal: It is the courage to continue that counts."</div>
+            <div class="quote-author">— Winston Churchill</div>
         </div>
         """, unsafe_allow_html=True)
         
