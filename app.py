@@ -80,16 +80,12 @@ def restart_quiz():
 # --- CSS for Blue & White Theme ---
 fade_css = """
 <style>
-/* Background for the entire app */
 body {
     background-color: #e6f0ff;
+    color: #003366;
+    font-family: Arial, sans-serif;
 }
 
-/* Fade-in cards */
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-}
 .fade-card {
     animation: fadeIn 0.8s ease-in-out;
     border-radius: 20px;
@@ -98,17 +94,9 @@ body {
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
-.fade-card h3 {
-    color: #003366;
-    margin-bottom: 10px;
-}
-.fade-card p {
-    color: #004080;
-    font-size: 16px;
-    font-weight: 600;
-}
+.fade-card h3 { color: #003366; }
+.fade-card p { color: #004080; font-weight: 600; }
 
-/* Streamlit buttons */
 .stButton>button {
     background-color: #004080;
     color: white;
@@ -117,14 +105,15 @@ body {
     padding: 8px 24px;
     border: none;
 }
-.stButton>button:hover {
-    background-color: #0059b3;
-    color: white;
-}
+.stButton>button:hover { background-color: #0059b3; }
 
-/* Progress bar color */
 div[data-testid="stProgressBar"]>div>div>div>div {
     background-color: #004080 !important;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
 }
 </style>
 """
@@ -137,8 +126,7 @@ else:
     if not st.session_state.quiz_started:
         st.title("🎓 Welcome to Your Personal Career Advisor")
         st.markdown(
-            "In the competitive landscape of modern education, making the right choice after Class 10th or 12th is crucial. "
-            "This AI-powered tool helps you discover your strengths and suggests the best educational stream and career path."
+            "Discover your strengths and get personalized guidance for your educational stream and career path."
         )
         st.info("✨ \"The best way to predict the future is to create it.\" — Abraham Lincoln")
         st.divider()
@@ -149,18 +137,12 @@ else:
     elif st.session_state.current_question < TOTAL_QUESTIONS:
         q_num = st.session_state.current_question
         st.markdown(f"### Question {q_num+1} of {TOTAL_QUESTIONS}")
-
-        # Progress bar
         progress = int((q_num / TOTAL_QUESTIONS) * 100)
         st.progress(progress)
 
         st.markdown(
-            f"""
-            <div class="fade-card">
-                <h3>{questions[q_num]}</h3>
-                <p>{tips[q_num]}</p>
-            </div>
-            """, unsafe_allow_html=True
+            f"<div class='fade-card'><h3>{questions[q_num]}</h3><p>{tips[q_num]}</p></div>",
+            unsafe_allow_html=True
         )
 
         st.radio(
@@ -182,9 +164,8 @@ else:
         prediction_text = label_encoder.inverse_transform(prediction_encoded)[0]
 
         st.balloons()
-        st.success(f"🎯 Congratulations! Your recommended stream is: **{prediction_text}**")
+        st.success(f"🎯 Your recommended stream: **{prediction_text}**")
 
-        # Motivational message
         stream_messages = {
             "Science": "🔬 Explore, experiment, and innovate! Your curiosity will lead you far.",
             "Commerce": "💰 Numbers and strategy are your allies. Time to build your empire!",
@@ -193,33 +174,34 @@ else:
         }
         st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
 
-        # Degree and career options
+        # Degree & Career options
         degree_map = {
-            "Science": [("B.Tech in CS", "💻"), ("B.Sc Physics", "⚛️"), ("MBBS", "🩺"), ("BCA", "🖥")],
-            "Commerce": [("B.Com Hons", "📚"), ("CA", "🧾"), ("BBA Finance", "💹"), ("BA Economics", "💵")],
-            "Arts": [("BA Psychology", "🧠"), ("BFA", "🎨"), ("BA Journalism", "📰"), ("BA English Lit", "📖")],
-            "Vocational": [("Diploma Web Designing", "💻"), ("ITI Electrical", "⚡"), ("B.Voc Hospitality", "🏨"), ("Skill Plumbing", "🔧")]
+            "Science": [("B.Tech in CS", "💻"), ("MBBS", "🩺"), ("B.Sc Physics", "⚛️")],
+            "Commerce": [("B.Com Hons", "📚"), ("CA", "🧾")],
+            "Arts": [("BA Psychology", "🧠"), ("BFA", "🎨")],
+            "Vocational": [("ITI Electrical", "⚡"), ("B.Voc Hospitality", "🏨")]
         }
+
         career_map = {
-            "Science": [("Software Engineer", "💻"), ("Research Scientist", "🔬"), ("Doctor", "🩺"), ("Data Scientist", "📊")],
-            "Commerce": [("Accountant", "📒"), ("Investment Banker", "💰"), ("Entrepreneur", "🚀"), ("Financial Analyst", "📈")],
-            "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨"), ("Journalist", "📰"), ("Content Writer", "✍️")],
-            "Vocational": [("Full-Stack Dev", "💻"), ("Electrician", "⚡"), ("Hotel Manager", "🏨"), ("Mechanic", "🔧")]
+            "Science": [("Software Engineer", "💻"), ("Doctor", "🩺")],
+            "Commerce": [("Accountant", "📒"), ("Entrepreneur", "🚀")],
+            "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨")],
+            "Vocational": [("Electrician", "⚡"), ("Mechanic", "🔧")]
         }
 
         st.subheader("🎓 Degree Options")
         for d, icon in degree_map.get(prediction_text, [("N/A","❓")]):
             with st.expander(f"{icon} {d}"):
-                st.write(f"Learn more about **{d}**. This program aligns with your interests in {prediction_text}.")
+                st.write(f"Learn more about **{d}**. Aligns with your interests in {prediction_text}.")
 
         st.subheader("💼 Career Paths")
         for c, icon in career_map.get(prediction_text, [("N/A","❓")]):
             with st.expander(f"{icon} {c}"):
-                st.write(f"Explore the path of a **{c}**. This career fits well with your strengths in {prediction_text}.")
+                st.write(f"Explore the path of a **{c}**. Fits your strengths in {prediction_text}.")
 
         st.divider()
 
-        # Radar Chart
+        # --- Attractive Radar Chart ---
         dimension_scores = {}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] = dimension_scores.get(dim, 0) + st.session_state.answers[i]
@@ -238,23 +220,32 @@ else:
                     r=scores,
                     theta=labels,
                     fill='toself',
-                    name='Interest Score',
+                    fillcolor='rgba(0,64,128,0.3)',
+                    line=dict(color='#004080', width=3, shape='spline'),
+                    marker=dict(size=10, color='#1f77b4'),
                     hoverinfo='text',
-                    hovertext=hover_text,
-                    line=dict(color='#004080', width=3)
+                    hovertext=hover_text
                 )
             ]
         )
 
         fig.update_layout(
             polar=dict(
-                radialaxis=dict(visible=True, range=[0, max(scores)+1])
+                bgcolor='#e6f0ff',
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, max(scores)+1],
+                    gridcolor='rgba(0,64,128,0.2)',
+                    linecolor='rgba(0,64,128,0.6)',
+                    tickfont=dict(color='#004080', size=12)
+                ),
+                angularaxis=dict(
+                    tickfont=dict(color='#004080', size=13),
+                    rotation=90
+                )
             ),
             showlegend=False,
-            title=dict(
-                text="📊 Your Interest Profile ",
-                font=dict(size=24, color="#004080")
-            ),
+            title=dict(text="📊 Your Interest Profile", font=dict(size=24, color="#004080")),
             paper_bgcolor='#e6f0ff',
             plot_bgcolor='#e6f0ff'
         )
