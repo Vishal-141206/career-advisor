@@ -12,11 +12,9 @@ st.set_page_config(
 )
 
 # --- LOAD MODEL & LABEL ENCODER ---
-# Use st.cache_resource to load the model and encoder only once.
 @st.cache_resource
 def load_artifacts():
     try:
-        # These files should be in the same directory as your app.py
         model = joblib.load('svm_model.pkl')
         label_encoder = joblib.load('label_encoder.pkl')
         return model, label_encoder
@@ -28,7 +26,6 @@ def load_artifacts():
 model, label_encoder = load_artifacts()
 
 # --- QUIZ DATA ---
-# A list of questions for the career quiz.
 questions = [
     "🔧 Do you enjoy hands-on activities like fixing gadgets, repairing things, or working with mechanical tools?",
     "🌳 Do you prefer spending time outdoors and being physically active rather than sitting indoors for long hours?",
@@ -45,7 +42,6 @@ questions = [
 ]
 TOTAL_QUESTIONS = len(questions)
 
-# Motivational tips corresponding to each question.
 tips = [
     "💪 Hands-on learning builds real skills. Keep experimenting!",
     "🌟 Being active boosts creativity and energy.",
@@ -61,7 +57,6 @@ tips = [
     "📊 Attention to detail is a powerful skill."
 ]
 
-# Mapping each question to one of the six Holland Code dimensions.
 dimension_map = [
     "Realistic", "Realistic", "Investigative", "Investigative",
     "Artistic", "Artistic", "Social", "Social",
@@ -69,94 +64,151 @@ dimension_map = [
 ]
 
 # --- SESSION STATE INITIALIZATION ---
-# This ensures that the quiz state is maintained across reruns.
 if 'current_question' not in st.session_state:
     st.session_state.current_question = 0
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
 # --- CALLBACK FUNCTIONS ---
-# These functions modify the session state.
 def next_question():
-    """Appends the current answer and increments the question number."""
     st.session_state.answers.append(st.session_state.current_answer)
     st.session_state.current_question += 1
 
 def restart_quiz():
-    """Resets the session state to start the quiz over."""
     st.session_state.current_question = 0
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
 # --- CSS STYLING ---
-# Defines the visual theme of the application.
 theme_css = """
 <style>
 body, .stApp {
-    background-color: #e6f0ff !important;
+    background-color: #f0f8ff !important;
+    color: #003366;
 }
 
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-
 .fade-card {
     animation: fadeIn 0.8s ease-in-out;
     border-radius: 20px;
     padding: 25px;
-    background: linear-gradient(135deg, #ffffff, #cce0ff);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #ffffff, #e6f2ff);
+    box-shadow: 0 8px 20px rgba(0,80,180,0.15);
     margin-bottom: 20px;
+    border: 1px solid #cce0ff;
 }
-.fade-card h3 { color: #003366; } /* Card question text */
-.fade-card p { color: #004080; font-weight: 600; } /* Card tip text */
+
+.fade-card h3 { 
+    color: #003366 !important;
+    margin-bottom: 15px;
+}
+
+.fade-card p { 
+    color: #00509e !important; 
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
 
 .stButton>button {
-    background-color: #004080;
-    color: white !important; /* FIX: Ensures button text is always white */
+    background-color: #0066cc;
+    color: white !important;
     font-weight: 600;
     border-radius: 12px;
-    padding: 8px 24px;
+    padding: 10px 24px;
     border: none;
+    transition: all 0.3s ease;
 }
+
 .stButton>button:hover {
-    background-color: #0059b3;
-    color: white !important; /* Also ensure hover text is white */
+    background-color: #0052a3;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,80,180,0.2);
 }
 
 div[data-testid="stProgressBar"]>div>div>div>div {
-    background-color: #004080 !important;
+    background-color: #0066cc !important;
 }
 
 /* Alerts */
 .stAlert > div {
     color: #003366 !important;
-    background-color: #cce0ff !important;
-    border-left: 6px solid #004080 !important;
+    background-color: #e6f2ff !important;
+    border-left: 6px solid #0066cc !important;
     border-radius: 10px !important;
-    padding: 10px 20px !important;
+    padding: 15px 20px !important;
 }
 
-/* Markdown text styling for better hierarchy */
-div[data-testid="stMarkdownContainer"] h1,
-div[data-testid="stMarkdownContainer"] h2,
-div[data-testid="stMarkdownContainer"] h3 {
-    color: #003366 !important; /* Darker blue for headers */
-}
-div[data-testid="stMarkdownContainer"] p,
-div[data-testid="stMarkdownContainer"] li {
-    color: #004080 !important; /* Slightly lighter blue for body text */
-}
-
-/* Expander header text */
-div[role="button"] > div > div > div {
+/* Headers */
+h1, h2, h3 {
     color: #003366 !important;
+}
+
+/* Radio buttons */
+div[role="radiogroup"] label {
+    color: #003366 !important;
+}
+
+div[role="radiogroup"] label:hover {
+    color: #0066cc !important;
+}
+
+/* Expander styling */
+.streamlit-expanderHeader {
+    color: #003366 !important;
+    font-weight: 600;
+    background-color: #e6f2ff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 5px;
+    border: 1px solid #cce0ff;
+}
+
+.streamlit-expanderContent {
+    background-color: #f7fbff;
+    border-radius: 0 0 8px 8px;
+    padding: 15px;
+    border: 1px solid #cce0ff;
+    border-top: none;
+}
+
+/* Progress bar container */
+div[data-testid="stProgressBar"] {
+    margin-bottom: 25px;
+}
+
+/* Success message */
+.stSuccess {
+    background-color: #e6f7ff !important;
+    color: #003366 !important;
+    border-left: 6px solid #0066cc !important;
+}
+
+/* Info message */
+.stInfo {
+    background-color: #e6f2ff !important;
+    color: #003366 !important;
+    border-left: 6px solid #0066cc !important;
+}
+
+/* Markdown text */
+div[data-testid="stMarkdownContainer"] p {
+    color: #003366 !important;
+}
+
+/* Divider */
+hr {
+    border-top: 2px solid #cce0ff !important;
+    margin: 30px 0 !important;
 }
 </style>
 """
+
 st.markdown(theme_css, unsafe_allow_html=True)
 
 # --- MAIN UI LOGIC ---
 if model is None or label_encoder is None:
-    # If model loading fails, the app stops here.
     st.warning("Application cannot proceed without the necessary model files.")
 else:
     # --- HOME PAGE ---
@@ -170,21 +222,19 @@ else:
         if st.button("🚀 Start Quiz", use_container_width=True):
             st.session_state.quiz_started = True
             st.rerun()
-
+    
     # --- QUIZ QUESTIONS ---
     elif st.session_state.current_question < TOTAL_QUESTIONS:
         q_num = st.session_state.current_question
         st.markdown(f"### Question {q_num + 1} of {TOTAL_QUESTIONS}")
         progress = int(((q_num) / TOTAL_QUESTIONS) * 100)
         st.progress(progress)
-
-        # Display question and tip in a styled card.
+        
         st.markdown(
             f"<div class='fade-card'><h3>{questions[q_num]}</h3><p>{tips[q_num]}</p></div>",
             unsafe_allow_html=True
         )
-
-        # Radio buttons for the answer.
+        
         st.radio(
             "Your answer:",
             options=[1, 2, 3, 4, 5],
@@ -192,22 +242,20 @@ else:
             key='current_answer',
             horizontal=True
         )
-
         st.button("Next ➡️", on_click=next_question, use_container_width=True)
-
+    
     # --- RESULTS PAGE ---
     else:
         with st.spinner("✨ Analyzing your results..."):
             time.sleep(1)
-
-        # Predict the stream using the loaded SVM model.
+        
         input_data = np.array([st.session_state.answers])
         prediction_encoded = model.predict(input_data)
         prediction_text = label_encoder.inverse_transform(prediction_encoded)[0]
-
+        
         st.balloons()
         st.success(f"🎯 Your recommended stream: **{prediction_text}**")
-
+        
         stream_messages = {
             "Science": "🔬 Explore, experiment, and innovate! Your curiosity will lead you far.",
             "Commerce": "💰 Numbers and strategy are your allies. Time to build your empire!",
@@ -215,7 +263,7 @@ else:
             "Vocational": "🛠 Hands-on skills open doors. Master your craft and shine!"
         }
         st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
-
+        
         # --- Degree & Career Options ---
         degree_map = {
             "Science": [("B.Tech in CS", "💻"), ("MBBS", "🩺"), ("B.Sc Physics", "⚛️")],
@@ -223,82 +271,78 @@ else:
             "Arts": [("BA in Psychology", "🧠"), ("Bachelor of Fine Arts (BFA)", "🎨"), ("Journalism & Mass Comm.", "📰")],
             "Vocational": [("ITI in Electrical", "⚡"), ("B.Voc in Hospitality", "🏨"), ("Diploma in Web Designing", "🌐")]
         }
-
+        
         career_map = {
             "Science": [("Software Engineer", "💻"), ("Doctor", "🩺"), ("Research Scientist", "🔬")],
             "Commerce": [("Accountant", "📒"), ("Entrepreneur", "🚀"), ("Financial Analyst", "💹")],
             "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨"), ("Journalist", "🎤")],
             "Vocational": [("Electrician", "⚡"), ("Mechanic", "🔧"), ("Chef", "👨‍🍳")]
         }
-
+        
         st.subheader("🎓 Potential Degree Options")
         for d, icon in degree_map.get(prediction_text, [("N/A", "❓")]):
             with st.expander(f"{icon} {d}"):
                 st.write(f"Learn more about **{d}**. This path aligns well with your interests in the {prediction_text} stream.")
-
+        
         st.subheader("💼 Possible Career Paths")
         for c, icon in career_map.get(prediction_text, [("N/A", "❓")]):
             with st.expander(f"{icon} {c}"):
                 st.write(f"Explore the path of a **{c}**. This career fits the strengths typically found in the {prediction_text} stream.")
-
+        
         st.divider()
-
+        
         # --- Radar Chart Visualization ---
         dimension_scores = {dim: 0 for dim in set(dimension_map)}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] += st.session_state.answers[i]
-
+        
         labels = list(dimension_scores.keys())
         scores = list(dimension_scores.values())
-
-        # Correctly generate hover text for the aggregated dimension scores.
+        
         hover_text = [f"Total Score: {score}" for score in scores]
-
-        # Ensure the chart loop closes by appending the first item to the end.
         scores_loop = scores + [scores[0]]
         labels_loop = labels + [labels[0]]
         hover_text_loop = hover_text + [hover_text[0]]
-
+        
         fig = go.Figure(
             data=[
                 go.Scatterpolar(
                     r=scores_loop,
                     theta=labels_loop,
                     fill='toself',
-                    fillcolor='rgba(0,64,128,0.3)',
-                    line=dict(color='#004080', width=3, shape='linear'),
-                    marker=dict(size=10, color='#004080'),
+                    fillcolor='rgba(0,102,204,0.3)',
+                    line=dict(color='#0066cc', width=3, shape='linear'),
+                    marker=dict(size=10, color='#0066cc'),
                     hoverinfo='theta+text',
                     hovertext=hover_text_loop
                 )
             ]
         )
-
+        
         fig.update_layout(
             polar=dict(
-                bgcolor='#e6f0ff',
+                bgcolor='#f0f8ff',
                 radialaxis=dict(
                     visible=True,
-                    range=[0, 10], # Max score for 2 questions (5+5) is 10.
-                    gridcolor='rgba(0,64,128,0.2)',
-                    linecolor='rgba(0,64,128,0.6)',
-                    tickfont=dict(color='#004080', size=12)
+                    range=[0, 10],
+                    gridcolor='rgba(0,102,204,0.2)',
+                    linecolor='rgba(0,102,204,0.6)',
+                    tickfont=dict(color='#003366', size=12)
                 ),
                 angularaxis=dict(
-                    tickfont=dict(color='#004080', size=13, weight='bold')
+                    tickfont=dict(color='#003366', size=13, weight='bold')
                 )
             ),
             showlegend=False,
-            title=dict(text="📊 Your Interest Profile", font=dict(size=24, color="#003366")),
-            paper_bgcolor='#e6f0ff',
-            plot_bgcolor='#e6f0ff',
+            title=dict(text="📊 Your Interest Profile", font=dict(size=28, color="#003366")),
+            paper_bgcolor='#f0f8ff',
+            plot_bgcolor='#f0f8ff',
             margin=dict(l=60, r=60, t=80, b=60)
         )
-
+        
         st.plotly_chart(fig, use_container_width=True)
-
+        
         # --- Restart Quiz Button ---
         if st.button("🔄 Take Quiz Again", use_container_width=True):
             restart_quiz()
             st.rerun()
-
