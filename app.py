@@ -80,12 +80,12 @@ def restart_quiz():
 # --- CSS for Blue & White Theme ---
 fade_css = """
 <style>
-body {
-    background-color: #e6f0ff;
+body, .css-18e3th9, .stApp {
+    background-color: #e6f0ff !important;
     color: #003366;
     font-family: Arial, sans-serif;
 }
-
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 .fade-card {
     animation: fadeIn 0.8s ease-in-out;
     border-radius: 20px;
@@ -96,7 +96,6 @@ body {
 }
 .fade-card h3 { color: #003366; }
 .fade-card p { color: #004080; font-weight: 600; }
-
 .stButton>button {
     background-color: #004080;
     color: white;
@@ -106,14 +105,8 @@ body {
     border: none;
 }
 .stButton>button:hover { background-color: #0059b3; }
-
 div[data-testid="stProgressBar"]>div>div>div>div {
     background-color: #004080 !important;
-}
-
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
 }
 </style>
 """
@@ -156,6 +149,7 @@ else:
         st.button("Next ➡️", on_click=next_question, use_container_width=True)
 
     else:
+        # --- Results ---
         with st.spinner("✨ Analyzing your results..."):
             time.sleep(1)
 
@@ -208,23 +202,22 @@ else:
 
         labels = list(dimension_scores.keys())
         scores = list(dimension_scores.values())
-        scores += scores[:1]
-        labels += labels[:1]
-
+        scores_loop = scores + [scores[0]]
+        labels_loop = labels + [labels[0]]
         hover_text = [f"{dim}: {st.session_state.answers[i]} — {tips[i]}" for i, dim in enumerate(dimension_map)]
-        hover_text += hover_text[:1]
+        hover_text_loop = hover_text + [hover_text[0]]
 
         fig = go.Figure(
             data=[
                 go.Scatterpolar(
-                    r=scores,
-                    theta=labels,
+                    r=scores_loop,
+                    theta=labels_loop,
                     fill='toself',
                     fillcolor='rgba(0,64,128,0.3)',
                     line=dict(color='#004080', width=3, shape='spline'),
                     marker=dict(size=10, color='#1f77b4'),
                     hoverinfo='text',
-                    hovertext=hover_text
+                    hovertext=hover_text_loop
                 )
             ]
         )
@@ -240,8 +233,7 @@ else:
                     tickfont=dict(color='#004080', size=12)
                 ),
                 angularaxis=dict(
-                    tickfont=dict(color='#004080', size=13),
-                    rotation=90
+                    tickfont=dict(color='#004080', size=13)
                 )
             ),
             showlegend=False,
@@ -252,7 +244,7 @@ else:
 
         st.plotly_chart(fig, use_container_width=True)
 
-        # Restart quiz
+        # --- Restart Quiz Button ---
         if st.button("🔄 Take Quiz Again", use_container_width=True):
             restart_quiz()
             st.rerun()
