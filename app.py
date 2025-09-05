@@ -69,7 +69,6 @@ if 'current_question' not in st.session_state:
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CALLBACK FUNCTIONS ---
 def next_question():
     st.session_state.answers.append(st.session_state.current_answer)
     st.session_state.current_question += 1
@@ -79,13 +78,18 @@ def restart_quiz():
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CSS STYLING (FIXED BUTTON TEXT TO WHITE) ---
+# --- FIXED THEME CSS (LIGHT BLUE BG + WHITE TEXT BUTTONS) ---
 theme_css = """
 <style>
-/* General button style */
+body, .stApp {
+    background-color: #f0f8ff !important; /* Light blue background */
+    color: #003366 !important;
+}
+
+/* All buttons: blue with white text */
 .stButton > button {
     background-color: #0066cc !important;
-    color: #ffffff !important;   /* ✅ Force white text */
+    color: #ffffff !important;   /* Force white text */
     font-weight: 600 !important;
     border-radius: 12px !important;
     padding: 10px 24px !important;
@@ -93,12 +97,17 @@ theme_css = """
     transition: all 0.3s ease !important;
 }
 
-/* Hover state */
+/* Button hover */
 .stButton > button:hover {
     background-color: #0052a3 !important;
-    color: #ffffff !important;   /* ✅ Keep text white */
+    color: #ffffff !important;   /* Keep text white */
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 8px rgba(0,80,180,0.2) !important;
+}
+
+/* Progress bar */
+div[data-testid="stProgressBar"]>div>div>div>div {
+    background-color: #0066cc !important;
 }
 </style>
 """
@@ -111,7 +120,7 @@ else:
     # --- HOME PAGE ---
     if not st.session_state.quiz_started:
         st.title("🎓 Welcome to Your Personal Career Advisor")
-        st.markdown("Discover your strengths and get personalized guidance...")
+        st.markdown("Discover your strengths and get personalized guidance for your future path.")
 
         if st.button("🚀 Start Your Journey Now", use_container_width=True):
             st.session_state.quiz_started = True
@@ -124,7 +133,7 @@ else:
         progress = int(((q_num) / TOTAL_QUESTIONS) * 100)
         st.progress(progress)
 
-        st.markdown(f"<div><h3>{questions[q_num]}</h3><p>{tips[q_num]}</p></div>", unsafe_allow_html=True)
+        st.markdown(f"<h3>{questions[q_num]}</h3><p>{tips[q_num]}</p>", unsafe_allow_html=True)
 
         st.radio(
             "Your answer:",
@@ -147,7 +156,40 @@ else:
         st.balloons()
         st.success(f"🎯 Your recommended stream: **{prediction_text}**")
 
-        # --- Restart Quiz Button ---
+        # --- Radar Chart ---
+        dimension_scores = {dim: 0 for dim in set(dimension_map)}
+        for i, dim in enumerate(dimension_map):
+            dimension_scores[dim] += st.session_state.answers[i]
+
+        labels = list(dimension_scores.keys())
+        scores = list(dimension_scores.values())
+        scores_loop = scores + [scores[0]]
+        labels_loop = labels + [labels[0]]
+
+        fig = go.Figure(
+            data=[
+                go.Scatterpolar(
+                    r=scores_loop,
+                    theta=labels_loop,
+                    fill='toself',
+                    fillcolor='rgba(0,102,204,0.3)',
+                    line=dict(color='#0066cc', width=3),
+                    marker=dict(size=10, color='#0066cc'),
+                )
+            ]
+        )
+        fig.update_layout(
+            polar=dict(
+                bgcolor='#f0f8ff',
+                radialaxis=dict(visible=True, range=[0, 10])
+            ),
+            showlegend=False,
+            title=dict(text="📊 Your Interest Profile", font=dict(size=20, color="#003366")),
+            paper_bgcolor='#f0f8ff',
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # --- Restart Button ---
         if st.button("🔄 Take Quiz Again", use_container_width=True):
             restart_quiz()
             st.rerun()
