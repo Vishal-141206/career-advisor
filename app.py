@@ -202,6 +202,58 @@ hr {
     border-top: 2px solid #cce0ff !important;
     margin: 30px 0 !important;
 }
+
+/* Motivational section */
+.motivation-card {
+    background: linear-gradient(135deg, #e6f2ff, #cce6ff);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 5px solid #0066cc;
+}
+
+.quote-text {
+    font-style: italic;
+    color: #004080;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.quote-author {
+    font-weight: 600;
+    color: #0066cc;
+    text-align: right;
+}
+
+/* Feature cards */
+.feature-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.feature-card {
+    flex: 1 1 calc(33.333% - 15px);
+    min-width: 200px;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 1px solid #cce0ff;
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.feature-title {
+    font-weight: 600;
+    color: #0066cc;
+    margin-bottom: 8px;
+}
 </style>
 """
 
@@ -217,9 +269,59 @@ else:
         st.markdown(
             "Discover your strengths and get personalized guidance for your educational stream and career path."
         )
-        st.info("✨ \"The best way to predict the future is to create it.\" — Abraham Lincoln")
+        
+        # Motivational Section
+        st.markdown("""
+        <div class="motivation-card">
+            <div class="quote-text">"The future depends on what you do today."</div>
+            <div class="quote-author">— Mahatma Gandhi</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Features Grid
+        st.subheader("🌟 What You'll Discover")
+        st.markdown("""
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-title">Your Strengths</div>
+                <div>Identify your natural talents and abilities</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Career Matches</div>
+                <div>Find careers that align with your personality</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <div class="feature-title">Education Paths</div>
+                <div>Discover the right educational streams for you</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # How It Works
+        with st.expander("ℹ️ How It Works"):
+            st.markdown("""
+            1. **Answer 12 simple questions** about your preferences and interests
+            2. **Our AI analyzes** your responses using the Holland Code model
+            3. **Get personalized recommendations** for educational streams and careers
+            4. **Explore your interest profile** with our interactive radar chart
+            
+            The assessment is based on John Holland's theory that people and work environments can be classified into six different groups:
+            Realistic, Investigative, Artistic, Social, Enterprising, and Conventional.
+            """)
+        
+        # Additional Motivation
+        st.markdown("""
+        <div class="motivation-card">
+            <div class="quote-text">"Choose a job you love, and you will never have to work a day in your life."</div>
+            <div class="quote-author">— Confucius</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         st.divider()
-        if st.button("🚀 Start Quiz", use_container_width=True):
+        if st.button("🚀 Start Your Journey Now", use_container_width=True):
             st.session_state.quiz_started = True
             st.rerun()
     
@@ -263,6 +365,14 @@ else:
             "Vocational": "🛠 Hands-on skills open doors. Master your craft and shine!"
         }
         st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
+        
+        # Final motivational quote
+        st.markdown("""
+        <div class="motivation-card">
+            <div class="quote-text">"Your time is limited, so don't waste it living someone else's life."</div>
+            <div class="quote-author">— Steve Jobs</div>
+        </div>
+        """, unsafe_allow_html=True)
         
         # --- Degree & Career Options ---
         degree_map = {
@@ -334,7 +444,7 @@ else:
                 )
             ),
             showlegend=False,
-            title=dict(text="📊 Your Interest Profile", font=dict(size=28, color="#003366")),
+            title=dict(text="📊 Your Interest Profile", font=dict(size=24, color="#003366")),
             paper_bgcolor='#f0f8ff',
             plot_bgcolor='#f0f8ff',
             margin=dict(l=60, r=60, t=80, b=60)
@@ -343,6 +453,6 @@ else:
         st.plotly_chart(fig, use_container_width=True)
         
         # --- Restart Quiz Button ---
-        if st.button("🔄 Take Quiz Again", use_container_width=True):
+        if st.button("🔄 Take Quiz Again", use_container_width=True, type="primary"):
             restart_quiz()
             st.rerun()
