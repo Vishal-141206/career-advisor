@@ -77,7 +77,7 @@ def restart_quiz():
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CSS for Blue & White Theme ---
+# --- CSS for Blue & White Theme + Alerts + Markdown ---
 fade_css = """
 <style>
 body, .css-18e3th9, .stApp {
@@ -107,6 +107,25 @@ body, .css-18e3th9, .stApp {
 .stButton>button:hover { background-color: #0059b3; }
 div[data-testid="stProgressBar"]>div>div>div>div {
     background-color: #004080 !important;
+}
+
+/* Alerts */
+.stAlert > div {
+    color: #003366 !important;
+    background-color: #cce0ff !important;
+    border-left: 6px solid #004080 !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+}
+
+/* Markdown text */
+div[data-testid="stMarkdownContainer"] * {
+    color: #003366 !important;
+}
+
+/* Expander header text */
+div[role="button"] > div > div > div {
+    color: #003366 !important;
 }
 </style>
 """
