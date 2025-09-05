@@ -12,18 +12,23 @@ st.set_page_config(
 )
 
 # --- LOAD MODEL & LABEL ENCODER ---
+# Use st.cache_resource to load the model and encoder only once.
 @st.cache_resource
 def load_artifacts():
     try:
+        # These files should be in the same directory as your app.py
         model = joblib.load('svm_model.pkl')
         label_encoder = joblib.load('label_encoder.pkl')
         return model, label_encoder
     except FileNotFoundError:
+        st.error("🚨 Critical Error: 'svm_model.pkl' or 'label_encoder.pkl' not found.")
+        st.info("Please make sure the model files are in the same folder as the application.")
         return None, None
 
 model, label_encoder = load_artifacts()
 
 # --- QUIZ DATA ---
+# A list of questions for the career quiz.
 questions = [
     "🔧 Do you enjoy hands-on activities like fixing gadgets, repairing things, or working with mechanical tools?",
     "🌳 Do you prefer spending time outdoors and being physically active rather than sitting indoors for long hours?",
@@ -40,6 +45,7 @@ questions = [
 ]
 TOTAL_QUESTIONS = len(questions)
 
+# Motivational tips corresponding to each question.
 tips = [
     "💪 Hands-on learning builds real skills. Keep experimenting!",
     "🌟 Being active boosts creativity and energy.",
@@ -55,36 +61,43 @@ tips = [
     "📊 Attention to detail is a powerful skill."
 ]
 
+# Mapping each question to one of the six Holland Code dimensions.
 dimension_map = [
     "Realistic", "Realistic", "Investigative", "Investigative",
     "Artistic", "Artistic", "Social", "Social",
     "Enterprising", "Enterprising", "Conventional", "Conventional"
 ]
 
-# --- SESSION STATE ---
+# --- SESSION STATE INITIALIZATION ---
+# This ensures that the quiz state is maintained across reruns.
 if 'current_question' not in st.session_state:
     st.session_state.current_question = 0
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CALLBACKS ---
+# --- CALLBACK FUNCTIONS ---
+# These functions modify the session state.
 def next_question():
+    """Appends the current answer and increments the question number."""
     st.session_state.answers.append(st.session_state.current_answer)
     st.session_state.current_question += 1
 
 def restart_quiz():
+    """Resets the session state to start the quiz over."""
     st.session_state.current_question = 0
     st.session_state.answers = []
     st.session_state.quiz_started = False
 
-# --- CSS for Blue & White Theme + Alerts + Markdown ---
-# FIX: Improved CSS for better visual hierarchy (distinct colors for headers and paragraphs).
+# --- CSS STYLING ---
+# Defines the visual theme of the application.
 theme_css = """
 <style>
 body, .stApp {
     background-color: #e6f0ff !important;
 }
+
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
 .fade-card {
     animation: fadeIn 0.8s ease-in-out;
     border-radius: 20px;
@@ -98,13 +111,16 @@ body, .stApp {
 
 .stButton>button {
     background-color: #004080;
-    color: white;
+    color: white !important; /* FIX: Ensures button text is always white */
     font-weight: 600;
     border-radius: 12px;
     padding: 8px 24px;
     border: none;
 }
-.stButton>button:hover { background-color: #0059b3; }
+.stButton>button:hover {
+    background-color: #0059b3;
+    color: white !important; /* Also ensure hover text is white */
+}
 
 div[data-testid="stProgressBar"]>div>div>div>div {
     background-color: #004080 !important;
@@ -138,10 +154,12 @@ div[role="button"] > div > div > div {
 """
 st.markdown(theme_css, unsafe_allow_html=True)
 
-# --- MAIN UI ---
+# --- MAIN UI LOGIC ---
 if model is None or label_encoder is None:
-    st.error("🚨 Model or label encoder missing. Ensure 'svm_model.pkl' and 'label_encoder.pkl' are present.")
+    # If model loading fails, the app stops here.
+    st.warning("Application cannot proceed without the necessary model files.")
 else:
+    # --- HOME PAGE ---
     if not st.session_state.quiz_started:
         st.title("🎓 Welcome to Your Personal Career Advisor")
         st.markdown(
@@ -153,17 +171,20 @@ else:
             st.session_state.quiz_started = True
             st.rerun()
 
+    # --- QUIZ QUESTIONS ---
     elif st.session_state.current_question < TOTAL_QUESTIONS:
         q_num = st.session_state.current_question
         st.markdown(f"### Question {q_num + 1} of {TOTAL_QUESTIONS}")
         progress = int(((q_num) / TOTAL_QUESTIONS) * 100)
         st.progress(progress)
 
+        # Display question and tip in a styled card.
         st.markdown(
             f"<div class='fade-card'><h3>{questions[q_num]}</h3><p>{tips[q_num]}</p></div>",
             unsafe_allow_html=True
         )
 
+        # Radio buttons for the answer.
         st.radio(
             "Your answer:",
             options=[1, 2, 3, 4, 5],
@@ -174,11 +195,12 @@ else:
 
         st.button("Next ➡️", on_click=next_question, use_container_width=True)
 
+    # --- RESULTS PAGE ---
     else:
-        # --- Results ---
         with st.spinner("✨ Analyzing your results..."):
             time.sleep(1)
 
+        # Predict the stream using the loaded SVM model.
         input_data = np.array([st.session_state.answers])
         prediction_encoded = model.predict(input_data)
         prediction_text = label_encoder.inverse_transform(prediction_encoded)[0]
@@ -194,34 +216,34 @@ else:
         }
         st.info(stream_messages.get(prediction_text, "✨ Explore your interests and shape your future!"))
 
-        # Degree & Career options
+        # --- Degree & Career Options ---
         degree_map = {
             "Science": [("B.Tech in CS", "💻"), ("MBBS", "🩺"), ("B.Sc Physics", "⚛️")],
-            "Commerce": [("B.Com Hons", "📚"), ("CA", "🧾")],
-            "Arts": [("BA Psychology", "🧠"), ("BFA", "🎨")],
-            "Vocational": [("ITI Electrical", "⚡"), ("B.Voc Hospitality", "🏨")]
+            "Commerce": [("B.Com Hons", "📚"), ("Chartered Accountancy (CA)", "🧾"), ("BBA", "📈")],
+            "Arts": [("BA in Psychology", "🧠"), ("Bachelor of Fine Arts (BFA)", "🎨"), ("Journalism & Mass Comm.", "📰")],
+            "Vocational": [("ITI in Electrical", "⚡"), ("B.Voc in Hospitality", "🏨"), ("Diploma in Web Designing", "🌐")]
         }
 
         career_map = {
-            "Science": [("Software Engineer", "💻"), ("Doctor", "🩺")],
-            "Commerce": [("Accountant", "📒"), ("Entrepreneur", "🚀")],
-            "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨")],
-            "Vocational": [("Electrician", "⚡"), ("Mechanic", "🔧")]
+            "Science": [("Software Engineer", "💻"), ("Doctor", "🩺"), ("Research Scientist", "🔬")],
+            "Commerce": [("Accountant", "📒"), ("Entrepreneur", "🚀"), ("Financial Analyst", "💹")],
+            "Arts": [("Psychologist", "🧠"), ("Graphic Designer", "🎨"), ("Journalist", "🎤")],
+            "Vocational": [("Electrician", "⚡"), ("Mechanic", "🔧"), ("Chef", "👨‍🍳")]
         }
 
-        st.subheader("🎓 Degree Options")
+        st.subheader("🎓 Potential Degree Options")
         for d, icon in degree_map.get(prediction_text, [("N/A", "❓")]):
             with st.expander(f"{icon} {d}"):
-                st.write(f"Learn more about **{d}**. Aligns with your interests in {prediction_text}.")
+                st.write(f"Learn more about **{d}**. This path aligns well with your interests in the {prediction_text} stream.")
 
-        st.subheader("💼 Career Paths")
+        st.subheader("💼 Possible Career Paths")
         for c, icon in career_map.get(prediction_text, [("N/A", "❓")]):
             with st.expander(f"{icon} {c}"):
-                st.write(f"Explore the path of a **{c}**. Fits your strengths in {prediction_text}.")
+                st.write(f"Explore the path of a **{c}**. This career fits the strengths typically found in the {prediction_text} stream.")
 
         st.divider()
 
-        # --- Attractive Radar Chart ---
+        # --- Radar Chart Visualization ---
         dimension_scores = {dim: 0 for dim in set(dimension_map)}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] += st.session_state.answers[i]
@@ -229,10 +251,10 @@ else:
         labels = list(dimension_scores.keys())
         scores = list(dimension_scores.values())
 
-        # FIX: Correctly generate hover text based on the aggregated dimension scores.
+        # Correctly generate hover text for the aggregated dimension scores.
         hover_text = [f"Total Score: {score}" for score in scores]
 
-        # Ensure the chart loop closes by appending the first item to the end
+        # Ensure the chart loop closes by appending the first item to the end.
         scores_loop = scores + [scores[0]]
         labels_loop = labels + [labels[0]]
         hover_text_loop = hover_text + [hover_text[0]]
@@ -244,10 +266,9 @@ else:
                     theta=labels_loop,
                     fill='toself',
                     fillcolor='rgba(0,64,128,0.3)',
-                    # FIX: Use a linear shape for clearer data representation in a radar chart.
                     line=dict(color='#004080', width=3, shape='linear'),
                     marker=dict(size=10, color='#004080'),
-                    hoverinfo='theta+text', # Display dimension name and custom text
+                    hoverinfo='theta+text',
                     hovertext=hover_text_loop
                 )
             ]
@@ -258,7 +279,7 @@ else:
                 bgcolor='#e6f0ff',
                 radialaxis=dict(
                     visible=True,
-                    range=[0, 10], # Max score for 2 questions (5+5) is 10
+                    range=[0, 10], # Max score for 2 questions (5+5) is 10.
                     gridcolor='rgba(0,64,128,0.2)',
                     linecolor='rgba(0,64,128,0.6)',
                     tickfont=dict(color='#004080', size=12)
@@ -271,7 +292,7 @@ else:
             title=dict(text="📊 Your Interest Profile", font=dict(size=24, color="#003366")),
             paper_bgcolor='#e6f0ff',
             plot_bgcolor='#e6f0ff',
-            margin=dict(l=60, r=60, t=80, b=60) # Add margin for better title spacing
+            margin=dict(l=60, r=60, t=80, b=60)
         )
 
         st.plotly_chart(fig, use_container_width=True)
