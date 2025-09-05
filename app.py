@@ -267,7 +267,8 @@ else:
     if not st.session_state.quiz_started:
         st.title("🎓 Welcome to Your Personal Career Advisor")
         st.markdown(
-            "Discover your strengths and get personalized guidance for your educational stream and career path."
+            "Discover your strengths and get personalized guidance for your educational stream and career path. 
+            Move beyond confusion and doubt with a data-driven plan tailored just for you. Make confident decisions today that will shape a successful and fulfilling tomorrow."
         )
         
         # Motivational Section
