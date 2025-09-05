@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import joblib
 import time
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # --- PAGE CONFIG ---
 st.set_page_config(
@@ -194,33 +194,42 @@ else:
 
         st.divider()
 
-        # --- Radar Chart ---
+        # --- Interactive Radar Chart using Plotly ---
         dimension_scores = {}
         for i, dim in enumerate(dimension_map):
             dimension_scores[dim] = dimension_scores.get(dim, 0) + st.session_state.answers[i]
 
         labels = list(dimension_scores.keys())
         scores = list(dimension_scores.values())
-        scores += scores[:1]  # close polygon
+        scores += scores[:1]
+        labels += labels[:1]
 
-        angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False).tolist()
-        angles += angles[:1]
+        hover_text = [f"{dim}: {st.session_state.answers[i]} — {tips[i]}" for i, dim in enumerate(dimension_map)]
+        hover_text += hover_text[:1]
 
-        colors = ['#FF6F61','#6B5B95','#88B04B','#F7CAC9','#92A8D1','#955251'][:len(labels)]
+        fig = go.Figure(
+            data=[
+                go.Scatterpolar(
+                    r=scores,
+                    theta=labels,
+                    fill='toself',
+                    name='Interest Score',
+                    hoverinfo='text',
+                    hovertext=hover_text,
+                    line=dict(color='#1f77b4', width=3)
+                )
+            ]
+        )
 
-        fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
-        ax.plot(angles, scores, 'o-', linewidth=2, color='#1f77b4')
-        ax.fill(angles, scores, color="#1f77b4", alpha=0.25)
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(visible=True, range=[0, max(scores)+1])
+            ),
+            showlegend=False,
+            title="📊 Your Interest Profile (Interactive)"
+        )
 
-        for i in range(len(labels)):
-            ax.plot([angles[i], angles[i+1]], [scores[i], scores[i+1]], color=colors[i], linewidth=2)
-
-        ax.set_thetagrids(np.degrees(angles[:-1]), labels, fontsize=12)
-        ax.set_ylim(0, max(scores)+1)
-        ax.set_title("Your Interest Profile", fontsize=16, pad=20)
-        ax.grid(True)
-
-        st.pyplot(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
         # Restart quiz
         if st.button("🔄 Take Quiz Again", use_container_width=True):
